@@ -3,12 +3,12 @@
 This project aims to create a skeleton for any turn based game using GameCenter.
 As GameCenter seems to lack in documentation and tutorials, especially as far as turn based gaming is concerned, I decided to create this project to help others who might want to integrate GameCenter to their projects.
 
-This project uses a custom UI to:
-	•	present a list of all games
-	•	display the local player's friends and allow him/her to pick one to invite
-	  ⁃	For the opponent to receive the invitation a turn must also be sent. Thus, in order to invite a friend, a friend is selected, an invitation request is made, and then a turn is also taken.
-	•	accept/decline an invitation
-	•	end and remove an active game
+This project uses a custom UI to:<br>
+	•	present a list of all games<br>
+	•	display the local player's friends and allow him/her to pick one to invite<br>
+	  ⁃	For the opponent to receive the invitation a turn must also be sent. Thus, in order to invite a friend, a friend is selected, an invitation request is made, and then a turn is also taken.<br>
+	•	accept/decline an invitation<br>
+	•	end and remove an active game<br>
 
 This project:
 
