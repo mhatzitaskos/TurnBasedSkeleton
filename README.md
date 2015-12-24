@@ -29,7 +29,7 @@ This project:
 
 	•	Allows the local user to send a new turn to an opponent, including data
 
-Special thanks go to:
-	•	IJReachability (https://github.com/Isuru-Nanayakkara/Reach/tree/master)
-	•	MBProgressHUD (https://github.com/jdg/MBProgressHUD)
-	•	FontAwesome (https://github.com/thii/FontAwesome.swift)
+Special thanks go to:<br>
+	•	IJReachability (https://github.com/Isuru-Nanayakkara/Reach/tree/master)<br>
+	•	MBProgressHUD (https://github.com/jdg/MBProgressHUD)<br>
+	•	FontAwesome (https://github.com/thii/FontAwesome.swift)<br>
