@@ -124,6 +124,8 @@ class NewGameViewController: UITableViewController {
         GameCenterSingleton.sharedInstance.endTurn(match, newTurn: newTurn) {
             _ in
             
+            //sendReminder should always be called after the first turn has ended so that the opponent receives a notification for the invitation to a new game.
+            GameCenterSingleton.sharedInstance.sendReminder(match)
             self.hud?.hide(true)
         }
     }

@@ -186,29 +186,38 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
         print("Received match ended notification")
     }
     
+    func player(player: GKPlayer, wantsToQuitMatch match: GKTurnBasedMatch) {
+        print("")
+        print("wantsToQuitMatch")
+    }
+    
+    /* //this is for real-time matches only (but the docs don't say that)
     func player(player: GKPlayer, didAcceptInvite invite: GKInvite) {
         print("")
         print("Received notification that opponent has accepted invite")
     }
+    */
     
+    
+    //For match launched via game center
     func player(player: GKPlayer, didRequestMatchWithOtherPlayers playersToInvite: [GKPlayer]) {
         print("")
         print("didRequestMatchWithOtherPlayers")
     }
     
+    /*
+    //For match launched via game center
+    //DEPRECATED: This is fired when the user asks to play with a friend from the game center.app
     func player(player: GKPlayer, didRequestMatchWithPlayers playerIDsToInvite: [String]) {
         print("")
         print("didRequestMatchWithPlayers")
     }
+    */
     
+    //For match launched via game center
     func player(player: GKPlayer, didRequestMatchWithRecipients recipientPlayers: [GKPlayer]) {
         print("")
         print("didRequestMatchWithRecipients")
-    }
-    
-    func player(player: GKPlayer, wantsToQuitMatch match: GKTurnBasedMatch) {
-        print("")
-        print("wantsToQuitMatch")
     }
     
     func player(player: GKPlayer, wantsToPlayChallenge challenge: GKChallenge) {
@@ -640,6 +649,25 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
         }
     }
     
+    //MARK: Send reminder
+    //This should be called whenever a new game is initialized so that the opponent receives the invitation.
+    func sendReminder(match:GKTurnBasedMatch) {
+        
+        let opponent = findParticipantsForMatch(match)!.opponent
+        
+        match.sendReminderToParticipants([opponent], localizableMessageKey: "New match received!", arguments: [], completionHandler: {
+            error in
+            
+            if error != nil {
+                print("")
+                print("ERROR: sending reminder")
+            } else {
+                print("")
+                print("Reminder sent")
+            }
+        })
+    }
+    
     //MARK: Quiting Match
     func quitMatch(match: GKTurnBasedMatch!, localPlayerOutcome: GKTurnBasedMatchOutcome?, completion: () -> Void) {
         
@@ -726,6 +754,8 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 
                 print("")
                 print("ERROR: did not remove game: \(error)")
+                
+                NSNotificationCenter.defaultCenter().postNotificationName("kEndTurnEvent", object: nil)
                 
             } else {
                 
