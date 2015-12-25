@@ -2,6 +2,7 @@
 
 This project aims to create a skeleton for any turn based game using GameCenter.
 As GameCenter seems to lack in documentation and tutorials, especially as far as turn based gaming is concerned, I decided to create this project to help others who might want to integrate GameCenter to their projects.
+This project (as-is) supports two player games. This could easily change with minimal alterations of the code.
 
 This project uses a custom UI to:<br>
 
@@ -9,7 +10,7 @@ This project uses a custom UI to:<br>
   <li>present a list of all games</li>
   <li>display the local player's friends and allow him/her to pick one to invite
   	<ul>
-  		<li>For the opponent to receive the invitation a turn must also be sent. Thus, in order to invite a friend, a friend is selected, an invitation request is made, and then a turn is also taken.</li>
+  		<li>For the opponent to receive the invitation a turn must also be sent, as well as a reminder. Thus, in order to invite a friend, a friend is selected, an invitation request is made, a turn is taken and a reminder is sent.</li>
   	</ul>
   </li>
   <li>accept/decline an invitation</li>
@@ -38,6 +39,8 @@ This project:<br>
 	<li>Allows the local user to receive a new turn from an opponent, including data
 	</li>
 	<li>Allows the local user to send a new turn to an opponent, including data
+	</li>
+	<li>Allows the local user to receive and be notified of a new invitation from an opponent
 	</li>
 </ul>
 Special thanks go to:<br>
