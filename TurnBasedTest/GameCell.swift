@@ -102,31 +102,14 @@ class GameCell: UITableViewCell {
         
         default:
             
-            if let matchData = match?.matchData {
+            if match?.currentParticipant?.player?.playerID == GKLocalPlayer.localPlayer().playerID {
                 
-                let data = MatchDataEncoding.decode(matchData)
+                //Local player that has pressed the quit button will lose, independent of score
+                let outcome = GKTurnBasedMatchOutcome.Lost
                 
-                if match?.currentParticipant?.player?.playerID == GKLocalPlayer.localPlayer().playerID {
-                    
-                    let outcome: GKTurnBasedMatchOutcome!
-                    
-                    //Initiator, thus local player won
-                    if data.score1 > data.score2 {
-                        outcome = GKTurnBasedMatchOutcome.Won
-                    
-                    //Its a tie
-                    } else if data.score1 == data.score2 {
-                        outcome = GKTurnBasedMatchOutcome.Tied
-
-                    //Opponent won
-                    } else {
-                        outcome = GKTurnBasedMatchOutcome.Lost
-                    }
-                
-                    GameCenterSingleton.sharedInstance.quitMatch(match, localPlayerOutcome: outcome, completion: {})
-                } else {
-                    GameCenterSingleton.sharedInstance.quitMatch(match, localPlayerOutcome: nil, completion: {})
-                }
+                GameCenterSingleton.sharedInstance.quitMatch(match, localPlayerOutcome: outcome, completion: {})
+            } else {
+                GameCenterSingleton.sharedInstance.quitMatch(match, localPlayerOutcome: nil, completion: {})
             }
         }
     }

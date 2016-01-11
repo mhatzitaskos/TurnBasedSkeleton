@@ -105,14 +105,14 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                     print("")
                     print("Matches loaded")
                     
-                    NSNotificationCenter.defaultCenter().postNotificationName("kMatchesLoaded", object: nil)
+                    NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
 
                 } else {
                     
                     print("")
                     print("There were no matches to load or some error occured")
                     
-                    NSNotificationCenter.defaultCenter().postNotificationName("kMatchesLoaded", object: nil)
+                    NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
                 }
             })
             
@@ -178,7 +178,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
         self.updateMatchDictionary(matchDictionary["allMatches"]!, completion: {
             _ in
             
-            NSNotificationCenter.defaultCenter().postNotificationName("kReceivedTurnEvent", object: nil)
+            NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
         })
     }
     
@@ -187,6 +187,25 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
         
         print("")
         print("Received match ended notification")
+        
+        let allMatches = matchDictionary["allMatches"]!
+        
+        for var i = 0; i < allMatches.count; i++ {
+            if allMatches[i].matchID == match.matchID {
+                
+                print("")
+                print("Ending/Updating an existing match")
+                
+                matchDictionary["allMatches"]!.removeAtIndex(i)
+                matchDictionary["allMatches"]!.append(match)
+            }
+        }
+        
+        self.updateMatchDictionary(matchDictionary["allMatches"]!, completion: {
+            _ in
+            
+            NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
+        })
     }
     
     func player(player: GKPlayer, wantsToQuitMatch match: GKTurnBasedMatch) {
@@ -412,7 +431,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
                     _ in
                     
-                    NSNotificationCenter.defaultCenter().postNotificationName("kMatchesLoaded", object: nil)
+                    NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
                 })
             }
             
@@ -421,6 +440,10 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
     }
     
     func updateMatchDictionary(matches: [GKTurnBasedMatch], completion: ([String:[GKTurnBasedMatch]]?) -> Void) {
+        
+        print("")
+        print("Update match dictionary")
+        
         self.matchDictionary.removeAll()
         
         var localPlayerTurnMatches = [GKTurnBasedMatch]()
@@ -719,7 +742,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                         self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
                             _ in
                             
-                            NSNotificationCenter.defaultCenter().postNotificationName("kEndTurnEvent", object: nil)
+                            NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
                             
                             JSSAlertView().show(
                                 self.presentingViewController!, // the parent view controller of the alert
@@ -753,7 +776,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                         self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
                             _ in
                             
-                            NSNotificationCenter.defaultCenter().postNotificationName("kEndTurnEvent", object: nil)
+                            NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
                             
                             JSSAlertView().show(
                                 self.presentingViewController!, // the parent view controller of the alert
@@ -780,7 +803,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
         
         let opponent = findParticipantsForMatch(match)!.opponent
         
-        match.sendReminderToParticipants([opponent], localizableMessageKey: "New match received!", arguments: [], completionHandler: {
+        match.sendReminderToParticipants([opponent], localizableMessageKey: "Reminder received!", arguments: [], completionHandler: {
             error in
             
             if error != nil {
@@ -800,7 +823,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
     func quitMatch(match: GKTurnBasedMatch!, localPlayerOutcome: GKTurnBasedMatchOutcome?, completion: () -> Void) {
         
         print("")
-        print("Quit game")
+        print("Quit match")
         
         //If local player is the current participant then he/she can end the match
         if GKLocalPlayer.localPlayer().playerID == match.currentParticipant?.player?.playerID {
@@ -833,18 +856,22 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                     print("")
                     print("Match Ended")
                     
-                    JSSAlertView().show(
-                        self.presentingViewController!, // the parent view controller of the alert
-                        title: "Match Ended" // the alert's title
-                    )
-                    
-                    NSNotificationCenter.defaultCenter().postNotificationName("kEndTurnEvent", object: nil)
+                    self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
+                        _ in
+                        
+                        NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
+                        
+                        JSSAlertView().show(
+                            self.presentingViewController!, // the parent view controller of the alert
+                            title: "Match Ended" // the alert's title
+                        )
+                    })
                 }
-                
+
                 completion()
             })
         
-        //If local player is not the current participant then he/she has to
+        //If local player is not the current participant then he/she has to quit out of turn
         } else {
             
             match.participantQuitOutOfTurnWithOutcome(GKTurnBasedMatchOutcome.Lost, withCompletionHandler: {
@@ -860,12 +887,18 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                     print("")
                     print("Local player quit match out of turn")
                     
-                    JSSAlertView().show(
-                        self.presentingViewController!, // the parent view controller of the alert
-                        title: "Local player quit match out of turn" // the alert's title
-                    )
-                    
-                    NSNotificationCenter.defaultCenter().postNotificationName("kEndTurnEvent", object: nil)
+                    self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
+                        _ in
+                        
+                        NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
+                        
+                        JSSAlertView().show(
+                            self.presentingViewController!, // the parent view controller of the alert
+                            title: "Local player quit match out of turn" // the alert's title
+                        )
+                        
+                        completion()
+                    })
                 }
             })
         }
@@ -883,7 +916,11 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 print("")
                 print("ERROR: did not remove game: \(error)")
                 
-                NSNotificationCenter.defaultCenter().postNotificationName("kEndTurnEvent", object: nil)
+                self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
+                    _ in
+                    
+                    NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
+                })
                 
             } else {
                 
@@ -902,12 +939,16 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                     }
                 }
                 
-                JSSAlertView().show(
-                    self.presentingViewController!, // the parent view controller of the alert
-                    title: "Removed match" // the alert's title
-                )
-                
-                NSNotificationCenter.defaultCenter().postNotificationName("kEndTurnEvent", object: nil)
+                self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
+                    _ in
+                    
+                    NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
+                    
+                    JSSAlertView().show(
+                        self.presentingViewController!, // the parent view controller of the alert
+                        title: "Removed match" // the alert's title
+                    )
+                })
             }
             
             completion()
@@ -934,12 +975,20 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
             } else {
                 print("Accepted invitation")
                 
-                JSSAlertView().show(
-                    self.presentingViewController!, // the parent view controller of the alert
-                    title: "Accepted invitation" // the alert's title
-                )
+                self.sendReminder(match!, completion: {
+                    _ in
+                })
                 
-                NSNotificationCenter.defaultCenter().postNotificationName("kEndTurnEvent", object: nil)
+                self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
+                    _ in
+                    
+                    NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
+                    
+                    JSSAlertView().show(
+                        self.presentingViewController!, // the parent view controller of the alert
+                        title: "Accepted invitation" // the alert's title
+                    )
+                })
             }
         })
     }
@@ -963,12 +1012,20 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
             } else {
                 print("Declined invitation")
                 
-                JSSAlertView().show(
-                    self.presentingViewController!, // the parent view controller of the alert
-                    title: "Declined invitation" // the alert's title
-                )
+                self.sendReminder(match!, completion: {
+                    _ in
+                })
                 
-                NSNotificationCenter.defaultCenter().postNotificationName("kEndTurnEvent", object: nil)
+                self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
+                    _ in
+                    
+                    NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
+                    
+                    JSSAlertView().show(
+                        self.presentingViewController!, // the parent view controller of the alert
+                        title: "Declined invitation" // the alert's title
+                    )
+                })
             }
         })
     }

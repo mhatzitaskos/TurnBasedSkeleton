@@ -16,9 +16,7 @@ class ListOfGamesViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSNotificationCenter.defaultCenter().addObserver(self , selector: "reloadTable", name: "kMatchesLoaded", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self , selector: "reloadTable", name: "kReceivedTurnEvent", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self , selector: "reloadTable", name: "kEndTurnEvent", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self , selector: "reloadTable", name: "kReloadMatchTable", object: nil)
         
         refreshTable.addTarget(self, action: "reloadMatches", forControlEvents: UIControlEvents.ValueChanged)
         refreshTable.tintColor = UIColor.grayColor()
@@ -42,14 +40,14 @@ class ListOfGamesViewController: UITableViewController {
                 print("")
                 print("Matches loaded")
                 
-                NSNotificationCenter.defaultCenter().postNotificationName("kMatchesLoaded", object: nil)
+                NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
                 
             } else {
                 
                 print("")
                 print("There were no matches to load or some error occured")
                 
-                NSNotificationCenter.defaultCenter().postNotificationName("kMatchesLoaded", object: nil)
+                NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
             }
             
             self.refreshTable.endRefreshing()
@@ -60,18 +58,7 @@ class ListOfGamesViewController: UITableViewController {
         print("")
         print("Reloading list of games table")
         
-        if let allMatches = GameCenterSingleton.sharedInstance.matchDictionary["allMatches"] {
-            
-            GameCenterSingleton.sharedInstance.updateMatchDictionary(allMatches, completion: {
-                
-                _ in
-                
-                self.tableView.reloadData()
-            })
-            
-        } else {
-            self.tableView.reloadData()
-        }
+        self.tableView.reloadData()
     }
 
     // MARK: - Table view data source
