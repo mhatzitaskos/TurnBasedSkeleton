@@ -20,6 +20,9 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
     
     var matchDictionary = [String:[GKTurnBasedMatch]]()
     
+    var currentMatch: GKTurnBasedMatch?
+    var totalNumberOfRounds: Int = 5
+    
     class var sharedInstance : GameCenterSingleton {
         /*
          The lazy initializer for a global variable (also for static members of structs and enums)
@@ -528,6 +531,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 }
                 
             }
+            
             initMatchRequest(request) {
                 match in
                 
@@ -602,11 +606,55 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 if self.matchDictionary["allMatches"] == nil &&
                     match != nil {
                     self.matchDictionary["allMatches"] = [match!]
+                } else if match != nil {
+                    
+                    print("")
+                    print("Retrieved a new match")
+                    
+                    self.matchDictionary["allMatches"]!.append(match!)
                 }
                 
                 completion(match: match)
             }
         })
+    }
+    
+    func rematch(match: GKTurnBasedMatch?, completion: (match: GKTurnBasedMatch?) -> Void) {
+        
+        if !GKLocalPlayer.localPlayer().authenticated {
+            print("")
+            print("Local player is NOT authenticated: NOT REMATCHING")
+            
+            completion(match: nil)
+            
+        } else {
+            
+            match?.rematchWithCompletionHandler({
+                
+                newMatch, error in
+                
+                if (error != nil) {
+                    
+                    print("")
+                    print("ERROR: Could not initialize rematch")
+                    completion(match: nil)
+                    
+                } else {
+                    
+                    print("")
+                    print("Rematch initialized")
+                    
+                    self.removeMatch(match, completion: {
+                        finished in
+                        
+                        print("")
+                        print("Previous match removed")
+                        
+                        completion(match: newMatch)
+                    })
+                }
+            })
+        }
     }
     
     //MARK: Playing Turn
@@ -616,32 +664,109 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
 
             let data = MatchDataEncoding.encode(match.matchData!, newTurn: newTurn)
             
-            match.endTurnWithNextParticipants([opponent], turnTimeout: 36000, matchData: data, completionHandler: {
-                error in
-                if (error != nil) {
+            //If the totalNumberOfRounds (i.e. the maximum number of rounds to be played) has been reached
+            //and the local player is not the initiation (i.e. he is the second player)
+            //then the game has reached its conclusion and finishes.
+            if MatchDataEncoding.decode(data).currentRound == totalNumberOfRounds && GKLocalPlayer.localPlayer().playerID != MatchDataEncoding.decode(data).initiator {
+                
+                let dataElements = MatchDataEncoding.decode(data)
+                
+                print("")
+                print("Match Score: \(dataElements.score1) - \(dataElements.score2)")
+                
+                if match.currentParticipant?.player?.playerID == GKLocalPlayer.localPlayer().playerID {
                     
-                    print("")
-                    print("ERROR: Could not send end turn")
-                    completion()
+                    let matchParticipants = findParticipantsForMatch(match)
                     
-                } else {
-                    print("")
-                    print("End turn was sent")
-                    
-                    self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
-                        _ in
+                    if dataElements.score1 > dataElements.score2 {
                         
-                        NSNotificationCenter.defaultCenter().postNotificationName("kEndTurnEvent", object: nil)
+                        print("")
+                        print("Match Result: Local player won")
                         
-                        JSSAlertView().show(
-                            self.presentingViewController!, // the parent view controller of the alert
-                            title: "Turn was sent" // the alert's title
-                        )
+                        matchParticipants!.localPlayer.matchOutcome = GKTurnBasedMatchOutcome.Won
+                        matchParticipants!.opponent.matchOutcome = GKTurnBasedMatchOutcome.Lost
                         
-                        completion()
-                    })
+                    } else if dataElements.score2 > dataElements.score1 {
+                        
+                        print("")
+                        print("Match Result: Opponent won")
+                        
+                        matchParticipants!.localPlayer.matchOutcome = GKTurnBasedMatchOutcome.Lost
+                        matchParticipants!.opponent.matchOutcome = GKTurnBasedMatchOutcome.Won
+                        
+                    } else {
+                        
+                        print("")
+                        print("Match Result: Tie")
+                        
+                        matchParticipants!.localPlayer.matchOutcome = GKTurnBasedMatchOutcome.Tied
+                        matchParticipants!.opponent.matchOutcome = GKTurnBasedMatchOutcome.Tied
+                    }
                 }
-            })
+                
+                match.endMatchInTurnWithMatchData(data, completionHandler: { (error) -> Void in
+                    if error != nil {
+                        
+                        print("")
+                        print("ERROR: Could not send end match")
+                        completion()
+                        
+                    } else {
+                        
+                        print("")
+                        print("End match was sent")
+ 
+                        self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
+                            _ in
+                            
+                            NSNotificationCenter.defaultCenter().postNotificationName("kEndTurnEvent", object: nil)
+                            
+                            JSSAlertView().show(
+                                self.presentingViewController!, // the parent view controller of the alert
+                                title: "End match was sent" // the alert's title
+                            )
+                            
+                            completion()
+                        })
+                    }
+                })
+                
+            } else {
+                
+                match.endTurnWithNextParticipants([opponent], turnTimeout: 36000, matchData: data, completionHandler: {
+                    error in
+                    if (error != nil) {
+                        
+                        print("")
+                        print("ERROR: Could not send end turn")
+                        completion()
+                        
+                    } else {
+                        print("")
+                        print("End turn was sent")
+                        
+                        let data = MatchDataEncoding.decode(data)
+                        
+                        print("")
+                        print("Match Score: \(data.score1) - \(data.score2)")
+                        
+                        self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
+                            _ in
+                            
+                            NSNotificationCenter.defaultCenter().postNotificationName("kEndTurnEvent", object: nil)
+                            
+                            JSSAlertView().show(
+                                self.presentingViewController!, // the parent view controller of the alert
+                                title: "Turn was sent" // the alert's title
+                            )
+                            
+                            completion()
+                        })
+                    }
+                })
+                
+            }
+            
         } else {
             print("")
             print("ERROR: Could not find match opponent")
@@ -651,7 +776,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
     
     //MARK: Send reminder
     //This should be called whenever a new game is initialized so that the opponent receives the invitation.
-    func sendReminder(match:GKTurnBasedMatch) {
+    func sendReminder(match:GKTurnBasedMatch, completion: () -> Void) {
         
         let opponent = findParticipantsForMatch(match)!.opponent
         
@@ -661,9 +786,12 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
             if error != nil {
                 print("")
                 print("ERROR: sending reminder")
+                completion()
             } else {
                 print("")
                 print("Reminder sent")
+                                
+                completion()
             }
         })
     }

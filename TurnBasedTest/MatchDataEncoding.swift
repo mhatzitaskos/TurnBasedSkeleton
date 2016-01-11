@@ -86,6 +86,9 @@ public class MatchDataEncoding {
         
         var turnsStr = ""
         
+        var scoreInitiator = 0
+        var scoreOpponent = 0
+        
         var  i = 1
         for turn in matchDataTurnDataObjects {
             
@@ -103,21 +106,32 @@ public class MatchDataEncoding {
             turnsStr += internalSeparator
             turnsStr += String (turn.turn)
             
+            //The initiator will play even rounds, starting from 0.
+            //The opponent will play odd rounds, starting from 1.
+            //The initiator's and opponent's scores are calculated from their turns.
+            if i%2 == 0 {
+                scoreInitiator += turn.pointsEarned
+            } else {
+                scoreOpponent += turn.pointsEarned
+            }
+            
             if i < matchDataTurnDataObjects.count {
                 
                 turnsStr += externalSeparator
                 i++
             }
-            
         }
         
         str += turnsStr
         str += majorSeparator
-        str += String(matchDataTuple.currentRound)
+        
+        //Rounds start from 1 (when 0 or 1 turns have been played) and increase every two turns.
+        i--
+        str += i == 0 || i == 1 ? "1" : String(Int(floor((CGFloat(i)/2)+1)))
         str += majorSeparator
-        str += String(matchDataTuple.score1)
+        str += String(scoreInitiator)
         str += majorSeparator
-        str += String(matchDataTuple.score2)
+        str += String(scoreOpponent)
         str += majorSeparator
         str += String(matchDataTuple.playerGroup)
         str += majorSeparator

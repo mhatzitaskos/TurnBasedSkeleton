@@ -63,6 +63,12 @@ class GameCell: UITableViewCell {
             declineQuitButton.hidden = false
             declineQuitButton.setTitle("Remove", forState: UIControlState.Normal)
         }
+        
+        if let matchData = match?.matchData {
+            
+            let currentRound = MatchDataEncoding.decode(matchData).currentRound
+            opponentLabel.text = "\(opponentLabel.text!) - Round: \(currentRound)"
+        }
     }
     
     @IBAction func acceptPlayButtonPressed(sender: AnyObject) {
@@ -75,7 +81,7 @@ class GameCell: UITableViewCell {
             GameCenterSingleton.sharedInstance.acceptInvitation(match)
             
         case MatchMode.localPlayerTurnMatches:
-            playFirstTurn(match!)
+            playTurn(match!)
             
         default:
             break
@@ -128,7 +134,7 @@ class GameCell: UITableViewCell {
     //This function acts as a dummy function that simulates a turn in the turn based game.
     //In a real game, the turn would first be played by the user, a TurnDataObject would be
     //created with the correct information and then the endTurn function would be called.
-    func playFirstTurn(match: GKTurnBasedMatch) {
+    func playTurn(match: GKTurnBasedMatch) {
         let newTurn = TurnDataObject(playerID: GKLocalPlayer.localPlayer().playerID!, word: "Word", substring: "o", substringStart: 1, subStringLength: 1, pointsEarned: 4, turn: 1)
         
         GameCenterSingleton.sharedInstance.endTurn(match, newTurn: newTurn) {}
