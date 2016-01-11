@@ -111,8 +111,6 @@ class NewGameViewController: UITableViewController {
             }
             
         }
-        
-        //self.tableView(tableView, didDeselectRowAtIndexPath: indexPath)
     }
     
     //This function acts as a dummy function that simulates a turn in the turn based game.
