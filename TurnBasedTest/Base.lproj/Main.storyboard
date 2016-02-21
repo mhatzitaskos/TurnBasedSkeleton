@@ -146,7 +146,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Xtc-EX-fPg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="969" y="-1013"/>
+            <point key="canvasLocation" x="1254" y="-1244"/>
         </scene>
         <!--New Game View Controller-->
         <scene sceneID="fBW-U8-Yd8">

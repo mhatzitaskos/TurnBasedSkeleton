@@ -119,6 +119,9 @@ class NewGameViewController: UITableViewController {
     func playFirstTurn(match: GKTurnBasedMatch) {
         let newTurn = TurnDataObject(playerID: GKLocalPlayer.localPlayer().playerID!, word: "Word", substring: "o", substringStart: 1, subStringLength: 1, pointsEarned: 4, turn: 1)
         
+        //May pass any message that is necessary for the receiver (ex. playerGroup)
+        match.message = ""
+        
         GameCenterSingleton.sharedInstance.endTurn(match, newTurn: newTurn) {
             _ in
             

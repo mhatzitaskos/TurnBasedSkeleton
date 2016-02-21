@@ -84,6 +84,7 @@
 			children = (
 				157BFD771C21542600CED84F /* GameKit.framework */,
 				157BFD541C205B9900CED84F /* TurnBasedTest */,
+				15F5EBCB1C441DA90069FF3F /* Supporting Files */,
 				157BFD531C205B9900CED84F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -115,16 +116,8 @@
 		15E502F41C22085100772EB3 /* GameCenter Helper files */ = {
 			isa = PBXGroup;
 			children = (
-				150E7E721C2C311C0032A1A3 /* hud */,
-				150E7E6E1C29A68F0032A1A3 /* JSSAlertView.swift */,
 				157BFD6F1C214D7D00CED84F /* GameCenterSingleton.swift */,
 				15C3577E1C25D379008E64EB /* MatchDataEncoding.swift */,
-				157BFD711C214F7B00CED84F /* IJReachability.swift */,
-				15E502E71C215D4800772EB3 /* ProfilePhoto.swift */,
-				15E502E91C215F2600772EB3 /* Extensions.swift */,
-				15E502EB1C217FA600772EB3 /* FontAwesome.otf */,
-				15E502EC1C217FA600772EB3 /* FontAwesome.swift */,
-				15E502EF1C21805200772EB3 /* Enum.swift */,
 			);
 			name = "GameCenter Helper files";
 			sourceTree = "<group>";
@@ -139,6 +132,22 @@
 				15DB27B11C26E9DE00DD3B55 /* GameHeaderCell.swift */,
 			);
 			name = "View Controllers";
+			sourceTree = "<group>";
+		};
+		15F5EBCB1C441DA90069FF3F /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				150E7E721C2C311C0032A1A3 /* hud */,
+				150E7E6E1C29A68F0032A1A3 /* JSSAlertView.swift */,
+				157BFD711C214F7B00CED84F /* IJReachability.swift */,
+				15E502E71C215D4800772EB3 /* ProfilePhoto.swift */,
+				15E502E91C215F2600772EB3 /* Extensions.swift */,
+				15E502EB1C217FA600772EB3 /* FontAwesome.otf */,
+				15E502EC1C217FA600772EB3 /* FontAwesome.swift */,
+				15E502EF1C21805200772EB3 /* Enum.swift */,
+			);
+			name = "Supporting Files";
+			path = TurnBasedTest;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

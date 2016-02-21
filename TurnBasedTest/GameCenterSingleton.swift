@@ -500,6 +500,21 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 
             } else if match.status == GKTurnBasedMatchStatus.Ended {
                 
+                //Declined matches are immediately removed from the user who declined them.
+                /*
+                if let participants = self.findParticipantsForMatch(match) {
+                    
+                    if participants.localPlayer.status == GKTurnBasedParticipantStatus.Declined {
+                        
+                        removeMatch(match, completion: {})
+                        
+                    } else {
+                        endedMatches.append(match)
+                    }
+                }
+                */
+                
+                //Declined matches are shown as "Ended Matches"
                 endedMatches.append(match)
                 
             } else if match.status == GKTurnBasedMatchStatus.Matching {
@@ -513,7 +528,16 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
             }
         }
         
-        self.matchDictionary = ["allMatches":matches, "localPlayerTurnMatches":localPlayerTurnMatches, "opponentTurnMatches":opponentTurnMatches, "endedMatches":endedMatches, "inInvitationModeMatches":inInvitationModeMatches, "inWaitingForIntivationReplyModeMatches":inWaitingForIntivationReplyModeMatches, "inSearchingModeMatches":inSearchingModeMatches]
+        var playersTurnMatches = [GKTurnBasedMatch]()
+        playersTurnMatches.appendContentsOf(inInvitationModeMatches)
+        playersTurnMatches.appendContentsOf(localPlayerTurnMatches)
+        
+        var opponentsTurnMatches = [GKTurnBasedMatch]()
+        opponentsTurnMatches.appendContentsOf(inSearchingModeMatches)
+        opponentsTurnMatches.appendContentsOf(inWaitingForIntivationReplyModeMatches)
+        opponentsTurnMatches.appendContentsOf(opponentTurnMatches)
+        
+        self.matchDictionary = ["allMatches":matches, "localPlayerTurnMatches":localPlayerTurnMatches, "opponentTurnMatches":opponentTurnMatches, "endedMatches":endedMatches, "inInvitationModeMatches":inInvitationModeMatches, "inWaitingForIntivationReplyModeMatches":inWaitingForIntivationReplyModeMatches, "inSearchingModeMatches":inSearchingModeMatches,  "playersTurnMatches":playersTurnMatches, "opponentsTurnMatches":opponentsTurnMatches]
         
         completion(self.matchDictionary)
     }
