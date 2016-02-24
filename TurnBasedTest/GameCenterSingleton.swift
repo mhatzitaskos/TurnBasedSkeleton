@@ -494,6 +494,11 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                     //Opponent has quit out of turn. End the match.
                     } else if participants.opponent.matchOutcome == GKTurnBasedMatchOutcome.Lost {
                         quitMatch(match, localPlayerOutcome: GKTurnBasedMatchOutcome.Won, completion: {})
+                    
+                    } else if participants.localPlayer.matchOutcome == GKTurnBasedMatchOutcome.Lost {
+                        //Message sent to other player and waiting for the current participant
+                        //to end the match. While the local player waits he/she will not be able
+                        //to see the match.
                     }
                     
                 }
@@ -515,11 +520,12 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 */
                 
                 //Declined matches are shown as "Ended Matches"
+                print("Add in endedMatches array")
                 endedMatches.append(match)
                 
             } else if match.status == GKTurnBasedMatchStatus.Matching {
                 
-                
+                inSearchingModeMatches.append(match)
                 
             } else if match.status == GKTurnBasedMatchStatus.Unknown {
                 

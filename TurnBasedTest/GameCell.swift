@@ -67,7 +67,13 @@ class GameCell: UITableViewCell {
         if let matchData = match?.matchData {
             
             let currentRound = MatchDataEncoding.decode(matchData).currentRound
-            opponentLabel.text = "\(opponentLabel.text!) - Round: \(currentRound)"
+            
+            if let labelText = opponentLabel.text {
+                opponentLabel.text = "\(labelText) - Round: \(currentRound)"
+            } else {
+                opponentLabel.text = "Random Opponent - Round: \(currentRound)"
+            }
+            
         }
     }
     
