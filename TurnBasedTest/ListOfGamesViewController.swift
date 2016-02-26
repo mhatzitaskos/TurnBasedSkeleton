@@ -17,7 +17,8 @@ class ListOfGamesViewController: UITableViewController {
         super.viewDidLoad()
         
         NSNotificationCenter.defaultCenter().addObserver(self , selector: "reloadTable", name: "kReloadMatchTable", object: nil)
-        
+        NSNotificationCenter.defaultCenter().addObserver(self , selector: "reloadMatches", name: "kReloadMatches", object: nil)
+
         refreshTable.addTarget(self, action: "reloadMatches", forControlEvents: UIControlEvents.ValueChanged)
         refreshTable.tintColor = UIColor.grayColor()
         refreshTable.attributedTitle = NSAttributedString(string: "LOADING", attributes: [NSForegroundColorAttributeName : UIColor.grayColor()])

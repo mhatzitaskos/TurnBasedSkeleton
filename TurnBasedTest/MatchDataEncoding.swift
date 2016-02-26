@@ -38,30 +38,37 @@ class TurnDataObject: NSObject {
 
 public class MatchDataEncoding {
     
-    class func decode(matchData: NSData) -> (initiator: String, turnsData: [TurnDataObject], currentRound: Int, score1: Int, score2: Int, playerGroup: Int, lastTurnTime: String, readChatMessages1: Int, readChatMessages2: Int) {
-
-        if matchData.length > 0 {
-            
-            let majorSeparator = "<|>"
-            
-            let dataString = NSString(data: matchData, encoding: NSUTF8StringEncoding)
-            let dataMessage: String = dataString as! String
-            let messageArray: [String] = dataMessage.componentsSeparatedByString(majorSeparator)
-            
-            let initiator = String(messageArray[0])
-            let turnsData = retrieveTurnsData(String(messageArray[1]))
-            let currentRound = Int(messageArray[2])
-            let score1 = Int(messageArray[3])
-            let score2 = Int(messageArray[4])
-            let playerGroup = Int(messageArray[5])
-            let lastTurnTime = String(messageArray[6])
-            let readChatMessages1 = Int(messageArray[7])
-            let readChatMessages2 = Int(messageArray[8])
-            
-            return (initiator, turnsData, currentRound!, score1!, score2!, playerGroup!, lastTurnTime, readChatMessages1!, readChatMessages2!)
+    class func decode(matchData: NSData?) -> (initiator: String, turnsData: [TurnDataObject], currentRound: Int, score1: Int, score2: Int, playerGroup: Int, lastTurnTime: String, readChatMessages1: Int, readChatMessages2: Int) {
         
+        if let data = matchData {
+            if data.length > 0 {
+                
+                let majorSeparator = "<|>"
+                
+                let dataString = NSString(data: data, encoding: NSUTF8StringEncoding)
+                let dataMessage: String = dataString as! String
+                let messageArray: [String] = dataMessage.componentsSeparatedByString(majorSeparator)
+                
+                let initiator = String(messageArray[0])
+                let turnsData = retrieveTurnsData(String(messageArray[1]))
+                let currentRound = Int(messageArray[2])
+                let score1 = Int(messageArray[3])
+                let score2 = Int(messageArray[4])
+                let playerGroup = Int(messageArray[5])
+                let lastTurnTime = String(messageArray[6])
+                let readChatMessages1 = Int(messageArray[7])
+                let readChatMessages2 = Int(messageArray[8])
+                
+                return (initiator, turnsData, currentRound!, score1!, score2!, playerGroup!, lastTurnTime, readChatMessages1!, readChatMessages2!)
+                
+            } else {
+                
+                //Match data is not nil but is empty, return initializing values.
+                return (GKLocalPlayer.localPlayer().playerID!, [TurnDataObject](), 1, 0, 0, 0, "", 0, 0)
+            }
         } else {
             
+            //Match data is nil, return initializing values.
             return (GKLocalPlayer.localPlayer().playerID!, [TurnDataObject](), 1, 0, 0, 0, "", 0, 0)
         }
     }

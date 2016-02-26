@@ -995,11 +995,13 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 print("ERROR: accepting invitation \(error)")
                 
                 //Error: No such session
-                if error?.code == 5003 {
+                if error!.userInfo["GKServerStatusCode"]!.intValue == 5003 {
                     
                     print("")
                     print("Opponent quit game, cannot accept")
-                    self.removeMatch(match, completion: {})
+                    
+                    //reload games
+                    NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatches", object: nil)
                 }
                 
             } else {
