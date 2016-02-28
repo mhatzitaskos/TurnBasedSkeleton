@@ -62,6 +62,11 @@ class ListOfGamesViewController: UITableViewController {
 
     // MARK: - Table view data source
 
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        //let cell = tableView.cellForRowAtIndexPath(indexPath) as! GameCell
+    }
+    
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
 
         return 6
@@ -143,6 +148,8 @@ class ListOfGamesViewController: UITableViewController {
                 let opponent = GameCenterSingleton.sharedInstance.findParticipantsForMatch(cell.match!)?.opponent
                 cell.opponentLabel.text = opponent?.player?.alias
                 cell.mode = MatchMode.localPlayerTurnMatches
+                
+                print("match in cell \(indexPath.section) \(indexPath.row) \(cell.match)")
             }
         case 4:
             if let opponentTurnMatches = GameCenterSingleton.sharedInstance.matchDictionary["opponentTurnMatches"] {

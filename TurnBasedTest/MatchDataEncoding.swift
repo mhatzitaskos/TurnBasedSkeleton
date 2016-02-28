@@ -59,6 +59,15 @@ public class MatchDataEncoding {
                 let readChatMessages1 = Int(messageArray[7])
                 let readChatMessages2 = Int(messageArray[8])
                 
+                print("")
+                print("Match Initiator: \(initiator)")
+                print("Match Round: \(currentRound)")
+                
+                for turn in turnsData {
+                    print("")
+                    print("Match Turn: \(turn.playerID), \(turn.word), \(turn.substring), \(turn.substringStart), \(turn.subStringLength), \(turn.pointsEarned), \(turn.turn)")
+                }
+                
                 return (initiator, turnsData, currentRound!, score1!, score2!, playerGroup!, lastTurnTime, readChatMessages1!, readChatMessages2!)
                 
             } else {
@@ -132,9 +141,8 @@ public class MatchDataEncoding {
         str += turnsStr
         str += majorSeparator
         
-        //Rounds start from 1 (when 0 or 1 turns have been played) and increase every two turns.
         i--
-        str += i == 0 || i == 1 ? "1" : String(Int(floor((CGFloat(i)/2)+1)))
+        str += String(Int(ceil((CGFloat(i)/2)+1)))
         str += majorSeparator
         str += String(scoreInitiator)
         str += majorSeparator
