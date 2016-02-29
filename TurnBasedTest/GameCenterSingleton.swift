@@ -760,7 +760,10 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                     
                     let matchParticipants = findParticipantsForMatch(match)
                     
-                    if dataElements.score1 > dataElements.score2 {
+                    //Score1 is for initiator of match, not local player.
+                    //Since this example has only two players that take turns, the game will end
+                    //when the local player is NOT the initiator.
+                    if dataElements.score1 < dataElements.score2 {
                         
                         print("")
                         print("Match Result: Local player won")
@@ -768,7 +771,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                         matchParticipants!.localPlayer.matchOutcome = GKTurnBasedMatchOutcome.Won
                         matchParticipants!.opponent.matchOutcome = GKTurnBasedMatchOutcome.Lost
                         
-                    } else if dataElements.score2 > dataElements.score1 {
+                    } else if dataElements.score2 < dataElements.score1 {
                         
                         print("")
                         print("Match Result: Opponent won")
