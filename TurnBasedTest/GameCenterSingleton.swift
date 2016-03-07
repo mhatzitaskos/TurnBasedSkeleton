@@ -197,24 +197,25 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
             _ in
             
             
-            let allMatches = self.matchDictionary["allMatches"]!
-            
-            for var i = 0; i < allMatches.count; i++ {
-                if allMatches[i].matchID == match.matchID {
-                    
-                    print("")
-                    print("Ending/Updating an existing match")
-                    
-                    self.matchDictionary["allMatches"]!.removeAtIndex(i)
-                    self.matchDictionary["allMatches"]!.append(match)
-                }
-            }
-            
-            self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
-                _ in
+            if let allMatches = self.matchDictionary["allMatches"] {
                 
-                NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
-            })
+                for var i = 0; i < allMatches.count; i++ {
+                    if allMatches[i].matchID == match.matchID {
+                        
+                        print("")
+                        print("Ending/Updating an existing match")
+                        
+                        self.matchDictionary["allMatches"]!.removeAtIndex(i)
+                        self.matchDictionary["allMatches"]!.append(match)
+                    }
+                }
+                
+                self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
+                    _ in
+                    
+                    NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
+                })
+            }
         })
     }
     
@@ -499,7 +500,17 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 if let participants = self.findParticipantsForMatch(match) {
                     
                     if participants.opponent.status == GKTurnBasedParticipantStatus.Matching {
-                        inSearchingModeMatches.append(match)
+                        
+                        if match.matchData?.length == 0 {
+                            
+                            quitMatch(match, localPlayerOutcome: GKTurnBasedMatchOutcome.Tied, completion: {
+                                _ in
+                                self.removeMatch(match, completion: {})
+                            })
+                            
+                        } else {
+                            inSearchingModeMatches.append(match)
+                        }
                         
                     } else if participants.opponent.status == GKTurnBasedParticipantStatus.Invited {
                         inWaitingForIntivationReplyModeMatches.append(match)
@@ -538,7 +549,9 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 /*
                 if let participants = self.findParticipantsForMatch(match) {
                 
-                if participants.localPlayer.status == GKTurnBasedParticipantStatus.Declined {
+                if participants.localPlayer.status == GKTurnBasedParticipantStatus.Declined  ||
+                    participants.opponent.status == GKTurnBasedParticipantStatus.Declined ||
+                    match.currentParticipant == nil {
                 
                 removeMatch(match, completion: {})
                 
