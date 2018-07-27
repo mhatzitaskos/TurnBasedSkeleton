@@ -25,11 +25,11 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
     
     class var sharedInstance : GameCenterSingleton {
         /*
-        The lazy initializer for a global variable (also for static members of structs and enums)
-        is run the first time that global (also static or struct or enum) is accessed, and is launched as dispatch_once
-        to make sure that the initialization is atomic.
-        This enables a cool way to use dispatch_once in your code: just declare a global variable (or static or struct) with an initializer and mark it private.
-        */
+         The lazy initializer for a global variable (also for static members of structs and enums)
+         is run the first time that global (also static or struct or enum) is accessed, and is launched as dispatch_once
+         to make sure that the initialization is atomic.
+         This enables a cool way to use dispatch_once in your code: just declare a global variable (or static or struct) with an initializer and mark it private.
+         */
         
         struct Singleton {
             
@@ -45,10 +45,14 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
         self.presentingViewController?.hud = MBProgressHUD.showAdded(to: self.presentingViewController?.view, animated: true)
         self.presentingViewController?.hud?.labelText = "LOADING MATCHES"
         
-        NotificationCenter.default.addObserver(self , selector: #selector(GameCenterSingleton.authenticationChanged), name: NSNotification.Name(rawValue: GKPlayerAuthenticationDidChangeNotificationName), object: nil)
+        NotificationCenter.default.addObserver(self ,
+                                               selector: #selector(GameCenterSingleton.authenticationChanged),
+                                               name: NSNotification.Name.GKPlayerAuthenticationDidChangeNotificationName,
+                                               object: nil)
         
         let localPlayer = GKLocalPlayer.localPlayer()
-        localPlayer.authenticateHandler = {(viewController : UIViewController?, error : NSError?) -> Void in
+        
+        localPlayer.authenticateHandler = {(viewController:UIViewController?, error:Error?) -> Void in
             
             if error != nil {
                 
@@ -65,7 +69,11 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 if ((viewController) != nil) {
                     
                     self.presentingViewController?.present(viewController!, animated: true, completion: {
-                        finished in
+                        
+                        //                    })
+                        //
+                        //                    self.presentingViewController?.present(viewController!, animated: true, completion: {
+                        //                        finished in
                         
                         print("")
                         print("PLAYER IS NOT AUTHENTICATED: presenting login screen")
@@ -79,10 +87,10 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                     
                 }
             }
-        } as! (UIViewController?, Error?) -> Void
+        }
     }
     
-    func authenticationChanged() {
+    @objc func authenticationChanged() {
         
         print("")
         print("AUTHENTICATION CHANGED")
@@ -147,7 +155,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
         print("Received turn event for match. Did become active \(didBecomeActive)")
         
         refreshMatchData(match, completion: {
-            _ in
+            
             
             if self.matchDictionary["allMatches"] == nil {
                 self.matchDictionary["allMatches"] = [match]
@@ -194,7 +202,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
         print("Received match ended notification")
         
         refreshMatchData(match, completion: {
-            _ in
+            
             
             
             if let allMatches = self.matchDictionary["allMatches"] {
@@ -225,11 +233,11 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
     }
     
     /* //this is for real-time matches only (but the docs don't say that)
-    func player(player: GKPlayer, didAcceptInvite invite: GKInvite) {
-    print("")
-    print("Received notification that opponent has accepted invite")
-    }
-    */
+     func player(player: GKPlayer, didAcceptInvite invite: GKInvite) {
+     print("")
+     print("Received notification that opponent has accepted invite")
+     }
+     */
     
     
     //For match launched via game center
@@ -239,13 +247,13 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
     }
     
     /*
-    //For match launched via game center
-    //DEPRECATED: This is fired when the user asks to play with a friend from the game center.app
-    func player(player: GKPlayer, didRequestMatchWithPlayers playerIDsToInvite: [String]) {
-    print("")
-    print("didRequestMatchWithPlayers")
-    }
-    */
+     //For match launched via game center
+     //DEPRECATED: This is fired when the user asks to play with a friend from the game center.app
+     func player(player: GKPlayer, didRequestMatchWithPlayers playerIDsToInvite: [String]) {
+     print("")
+     print("didRequestMatchWithPlayers")
+     }
+     */
     
     //For match launched via game center
     func player(_ player: GKPlayer, didRequestMatchWithRecipients recipientPlayers: [GKPlayer]) {
@@ -390,6 +398,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
         } else {
             
             GKTurnBasedMatch.loadMatches { (matches, error) in
+                //            GKTurnBasedMatch.loadMatches { (matches:[GKTurnBasedMatch]?, error:NSError?) -> Void in
                 
                 if error != nil {
                     
@@ -405,7 +414,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                         print("Loaded \(loadedMatches.count) matches")
                         
                         self.refreshMatchesData(loadedMatches, completion: {
-                            _ in
+                            
                             
                             self.updateMatchDictionary(loadedMatches, completion: {
                                 _ in
@@ -425,6 +434,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                     
                 }
             }
+            
         }
     }
     
@@ -454,12 +464,12 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
         
         for i in 0 ..< matches.count {
             refreshMatchData(matches[i], completion: {
-                finished in
+                //                finished in
                 
                 matchesLoaded += 1
                 
                 if matchesLoaded == matches.count {
-
+                    
                     completion()
                 }
             })
@@ -503,7 +513,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                         if match.matchData?.count == 0 {
                             
                             quitMatch(match, localPlayerOutcome: GKTurnBasedMatchOutcome.tied, completion: {
-                                _ in
+                                
                                 self.removeMatch(match, completion: {})
                             })
                             
@@ -521,16 +531,16 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                         participants.opponent.matchOutcome == GKTurnBasedMatchOutcome.none &&
                         participants.localPlayer.status == GKTurnBasedParticipantStatus.active &&
                         participants.localPlayer.matchOutcome == GKTurnBasedMatchOutcome.none {
+                        
+                        if match.currentParticipant?.player?.playerID == GKLocalPlayer.localPlayer().playerID {
+                            localPlayerTurnMatches.append(match)
                             
-                            if match.currentParticipant?.player?.playerID == GKLocalPlayer.localPlayer().playerID {
-                                localPlayerTurnMatches.append(match)
-                                
-                            } else {
-                                
-                                opponentTurnMatches.append(match)
-                            }
+                        } else {
                             
-                            //Opponent has quit out of turn. End the match.
+                            opponentTurnMatches.append(match)
+                        }
+                        
+                        //Opponent has quit out of turn. End the match.
                     } else if participants.opponent.matchOutcome == GKTurnBasedMatchOutcome.lost {
                         self.quitMatch(match, localPlayerOutcome: GKTurnBasedMatchOutcome.won, completion: {})
                         
@@ -546,19 +556,19 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 
                 //Declined matches are immediately removed from the user who declined them.
                 /*
-                if let participants = self.findParticipantsForMatch(match) {
-                
-                if participants.localPlayer.status == GKTurnBasedParticipantStatus.Declined  ||
-                    participants.opponent.status == GKTurnBasedParticipantStatus.Declined ||
-                    match.currentParticipant == nil {
-                
-                removeMatch(match, completion: {})
-                
-                } else {
-                endedMatches.append(match)
-                }
-                }
-                */
+                 if let participants = self.findParticipantsForMatch(match) {
+                 
+                 if participants.localPlayer.status == GKTurnBasedParticipantStatus.Declined  ||
+                 participants.opponent.status == GKTurnBasedParticipantStatus.Declined ||
+                 match.currentParticipant == nil {
+                 
+                 removeMatch(match, completion: {})
+                 
+                 } else {
+                 endedMatches.append(match)
+                 }
+                 }
+                 */
                 
                 //Declined matches are shown as "Ended Matches"
                 print("Add in endedMatches array")
@@ -612,16 +622,16 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 
                 if response == GKInviteeResponse.inviteRecipientResponseDeclined ||
                     response == GKInviteRecipientResponse.inviteeResponseDeclined {
-                        
-                        print("")
-                        print("\(player.alias) declined invitation")
-                        
+                    
+                    print("")
+                    print("\(player.alias) declined invitation")
+                    
                 } else if response == GKInviteeResponse.inviteeResponseAccepted ||
                     response == GKInviteRecipientResponse.inviteeResponseAccepted {
                     
-                        print("")
-                        print("\(player.alias) accepted invitation")
-                        
+                    print("")
+                    print("\(player.alias) accepted invitation")
+                    
                 }
                 
             }
@@ -660,16 +670,16 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 
                 if response == GKInviteeResponse.inviteRecipientResponseDeclined ||
                     response == GKInviteRecipientResponse.inviteeResponseDeclined {
-                        
-                        print("")
-                        print("\(player.alias) declined invitation")
-                        
+                    
+                    print("")
+                    print("\(player.alias) declined invitation")
+                    
                 } else if response == GKInviteeResponse.inviteeResponseAccepted ||
                     response == GKInviteRecipientResponse.inviteeResponseAccepted {
-                        
-                        print("")
-                        print("\(player.alias) accepted invitation")
-                        
+                    
+                    print("")
+                    print("\(player.alias) accepted invitation")
+                    
                 }
                 
             }
@@ -684,7 +694,8 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
     }
     
     func initMatchRequest(_ request: GKMatchRequest, completion: @escaping (_ match: GKTurnBasedMatch?) -> Void) {
-        GKTurnBasedMatch.find(for: request, withCompletionHandler: { (match:GKTurnBasedMatch?, error:NSError?) -> Void in
+        GKTurnBasedMatch.find(for: request) { (match, error) in
+            //        GKTurnBasedMatch.find(for: request, withCompletionHandler: { (match:GKTurnBasedMatch?, error:NSError?) -> Void in
             
             if error != nil {
                 
@@ -699,7 +710,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 
                 if self.matchDictionary["allMatches"] == nil &&
                     match != nil {
-                        self.matchDictionary["allMatches"] = [match!]
+                    self.matchDictionary["allMatches"] = [match!]
                 } else if match != nil {
                     
                     print("")
@@ -710,7 +721,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 
                 completion(match)
             }
-        } as! (GKTurnBasedMatch?, Error?) -> Void)
+        }
     }
     
     func rematch(_ match: GKTurnBasedMatch?, completion: @escaping (_ match: GKTurnBasedMatch?) -> Void) {
@@ -739,7 +750,7 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                     print("Rematch initialized")
                     
                     self.removeMatch(match, completion: {
-                        finished in
+                        //                        finished in
                         
                         print("")
                         print("Previous match removed")
@@ -1038,21 +1049,21 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 print("")
                 print("ERROR: accepting invitation \(error)")
                 
-                //Error: No such session
-                //if error!.userInfo["GKServerStatusCode"]!.int32Value == 5003 {
-                    
-                    print("")
-                    print("Opponent quit game, cannot accept")
-                    
-                    //reload games
-                    NotificationCenter.default.post(name: Notification.Name(rawValue: "kReloadMatches"), object: nil)
-                //}
+                //                //Error: No such session
+                //                if error!.userInfo["GKServerStatusCode"]!.int32Value == 5003 {
+                
+                print("")
+                print("Opponent quit game, cannot accept")
+                
+                //reload games
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "kReloadMatches"), object: nil)
+                //                }
                 
             } else {
                 print("Accepted invitation")
                 
                 self.sendReminder(match!, completion: {
-                    _ in
+                    
                 })
                 
                 self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {
@@ -1077,19 +1088,19 @@ class GameCenterSingleton:NSObject, GKLocalPlayerListener, UIAlertViewDelegate {
                 print("")
                 print("ERROR: declining invitation \(error)")
                 
-                //Error: No such session
-                //if error?.code == 5003 {
-                    
-                    print("")
-                    print("Opponent quit game, cannot decline")
-                    self.removeMatch(match, completion: {})
-                //}
+                //                //Error: No such session
+                //                if error?.code == 5003 {
+                //
+                //                    print("")
+                //                    print("Opponent quit game, cannot decline")
+                //                    self.removeMatch(match, completion: {})
+                //                }
                 
             } else {
                 print("Declined invitation")
                 
                 self.sendReminder(match!, completion: {
-                    _ in
+                    
                 })
                 
                 self.updateMatchDictionary(self.matchDictionary["allMatches"]!, completion: {

@@ -95,7 +95,7 @@ class ProfilePhoto {
                 let initialsLabel = UILabel(frame: iconView.frame)
                 
                 //initialsLabel.text = p.alias!.substringToIndex(p.alias!.characters.index(p.alias!.startIndex, offsetBy: 2)).uppercased()
-                initialsLabel.text = "YO"//p.alias!.prefix(2).uppercased()
+                initialsLabel.text = p.alias!.prefix(2).uppercased()
 
                 initialsLabel.textAlignment = NSTextAlignment.center
                 initialsLabel.textColor = UIColor.white
@@ -103,7 +103,7 @@ class ProfilePhoto {
                 initialsLabel.center = CGPoint(x: iconView.frame.width/2, y: iconView.frame.height/2)
                 iconView.addSubview(initialsLabel)
                 
-                p.loadPhoto(forSize: size, withCompletionHandler: {
+                p.loadPhoto(for: size, withCompletionHandler: {
                     image, error in
                     
                     if (error != nil) {
