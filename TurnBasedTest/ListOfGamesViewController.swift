@@ -16,13 +16,13 @@ class ListOfGamesViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSNotificationCenter.defaultCenter().addObserver(self , selector: "reloadTable", name: "kReloadMatchTable", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self , selector: "reloadMatches", name: "kReloadMatches", object: nil)
+        NotificationCenter.default.addObserver(self , selector: #selector(ListOfGamesViewController.reloadTable), name: NSNotification.Name(rawValue: "kReloadMatchTable"), object: nil)
+        NotificationCenter.default.addObserver(self , selector: #selector(ListOfGamesViewController.reloadMatches), name: NSNotification.Name(rawValue: "kReloadMatches"), object: nil)
 
-        refreshTable.addTarget(self, action: "reloadMatches", forControlEvents: UIControlEvents.ValueChanged)
-        refreshTable.tintColor = UIColor.grayColor()
-        refreshTable.attributedTitle = NSAttributedString(string: "LOADING", attributes: [NSForegroundColorAttributeName : UIColor.grayColor()])
-        refreshTable.backgroundColor = UIColor.clearColor()
+        refreshTable.addTarget(self, action: #selector(ListOfGamesViewController.reloadMatches), for: UIControlEvents.valueChanged)
+        refreshTable.tintColor = UIColor.gray
+        refreshTable.attributedTitle = NSAttributedString(string: "LOADING", attributes: [NSForegroundColorAttributeName : UIColor.gray])
+        refreshTable.backgroundColor = UIColor.clear
         tableView.addSubview(refreshTable)
     }
 
@@ -48,7 +48,7 @@ class ListOfGamesViewController: UITableViewController {
                 
             }
             
-            NSNotificationCenter.defaultCenter().postNotificationName("kReloadMatchTable", object: nil)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "kReloadMatchTable"), object: nil)
             self.refreshTable.endRefreshing()
         })
     }
@@ -62,17 +62,17 @@ class ListOfGamesViewController: UITableViewController {
 
     // MARK: - Table view data source
 
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         //let cell = tableView.cellForRowAtIndexPath(indexPath) as! GameCell
     }
     
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
 
         return 6
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         switch section {
         case 0:
@@ -117,8 +117,8 @@ class ListOfGamesViewController: UITableViewController {
     }
 
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("GameCell", forIndexPath: indexPath)
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "GameCell", for: indexPath)
             as! GameCell
         
         switch indexPath.section {
@@ -173,9 +173,9 @@ class ListOfGamesViewController: UITableViewController {
         return cell
     }
     
-    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let  headerCell = tableView.dequeueReusableCellWithIdentifier("GameHeaderCell") as! GameHeaderCell
-        headerCell.backgroundColor = UIColor.lightGrayColor()
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let  headerCell = tableView.dequeueReusableCell(withIdentifier: "GameHeaderCell") as! GameHeaderCell
+        headerCell.backgroundColor = UIColor.lightGray
         
         switch (section) {
         case 0:
