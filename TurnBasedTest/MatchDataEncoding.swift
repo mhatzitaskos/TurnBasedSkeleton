@@ -36,18 +36,18 @@ class TurnDataObject: NSObject {
     }
 }
 
-public class MatchDataEncoding {
+open class MatchDataEncoding {
     
-    class func decode(matchData: NSData?) -> (initiator: String, turnsData: [TurnDataObject], currentRound: Int, score1: Int, score2: Int, playerGroup: Int, lastTurnTime: String, readChatMessages1: Int, readChatMessages2: Int) {
+    class func decode(_ matchData: Data?) -> (initiator: String, turnsData: [TurnDataObject], currentRound: Int, score1: Int, score2: Int, playerGroup: Int, lastTurnTime: String, readChatMessages1: Int, readChatMessages2: Int) {
         
         if let data = matchData {
-            if data.length > 0 {
+            if data.count > 0 {
                 
                 let majorSeparator = "<|>"
                 
-                let dataString = NSString(data: data, encoding: NSUTF8StringEncoding)
+                let dataString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
                 let dataMessage: String = dataString as! String
-                let messageArray: [String] = dataMessage.componentsSeparatedByString(majorSeparator)
+                let messageArray: [String] = dataMessage.components(separatedBy: majorSeparator)
                 
                 let initiator = String(messageArray[0])
                 let turnsData = retrieveTurnsData(String(messageArray[1]))
@@ -82,9 +82,9 @@ public class MatchDataEncoding {
         }
     }
     
-    class func encode(matchData: NSData, newTurn: TurnDataObject) -> NSData {
+    class func encode(_ matchData: Data, newTurn: TurnDataObject) -> Data {
         
-        let dateFormater = NSDateFormatter()
+        let dateFormater = DateFormatter()
         dateFormater.dateFormat = "MM dd, yyyy HH:mm:ss"
         
         let majorSeparator = "<|>"
@@ -134,14 +134,14 @@ public class MatchDataEncoding {
             if i < matchDataTurnDataObjects.count {
                 
                 turnsStr += externalSeparator
-                i++
+                i += 1
             }
         }
         
         str += turnsStr
         str += majorSeparator
         
-        i--
+        i -= 1
         str += String(Int(ceil((CGFloat(i)/2)+1)))
         str += majorSeparator
         str += String(scoreInitiator)
@@ -150,16 +150,16 @@ public class MatchDataEncoding {
         str += majorSeparator
         str += String(matchDataTuple.playerGroup)
         str += majorSeparator
-        str += dateFormater.stringFromDate(NSDate())
+        str += dateFormater.string(from: Date())
         str += majorSeparator
         str += String(matchDataTuple.readChatMessages1)
         str += majorSeparator
         str += String(matchDataTuple.readChatMessages2)
         
-        return str.dataUsingEncoding(NSUTF8StringEncoding)!
+        return str.data(using: String.Encoding.utf8)!
     }
 
-    class func retrieveTurnsData(turns: String) -> [TurnDataObject] {
+    class func retrieveTurnsData(_ turns: String) -> [TurnDataObject] {
         
         let externalSeparator = "[]"
         let internalSeparator = "(:)"
@@ -167,9 +167,9 @@ public class MatchDataEncoding {
         var turnsObjects = [TurnDataObject]()
         var turnsArray = [String]()
         
-        if  NSString(string: turns).containsString(externalSeparator) {
+        if  NSString(string: turns).contains(externalSeparator) {
             
-            turnsArray = turns.componentsSeparatedByString(externalSeparator)
+            turnsArray = turns.components(separatedBy: externalSeparator)
             
         } else {
             
@@ -178,7 +178,7 @@ public class MatchDataEncoding {
         
         for turn in turnsArray {
             
-            let turnData = turn.componentsSeparatedByString(internalSeparator)
+            let turnData = turn.components(separatedBy: internalSeparator)
             let oneTurn:TurnDataObject = TurnDataObject()
             oneTurn.playerID = turnData[0]
             oneTurn.word = turnData[1]

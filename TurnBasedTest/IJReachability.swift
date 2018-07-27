@@ -10,30 +10,30 @@ import Foundation
 import SystemConfiguration
 
 public enum IJReachabilityType {
-    case WWAN,
-    WiFi,
-    NotConnected
+    case wwan,
+    wiFi,
+    notConnected
 }
 
-public class IJReachability {
+open class IJReachability {
     
     /**
     :see: Original post - http://www.chrisdanielson.com/2009/07/22/iphone-network-connectivity-test-example/
     */
-    public class func isConnectedToNetwork() -> Bool {
+    open class func isConnectedToNetwork() -> Bool {
         
         var Status:Bool = false
-        let url = NSURL(string: "https://google.com/")
-        let request = NSMutableURLRequest(URL: url!)
-        request.HTTPMethod = "HEAD"
-        request.cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalAndRemoteCacheData
+        let url = URL(string: "https://google.com/")
+        let request = NSMutableURLRequest(url: url!)
+        request.httpMethod = "HEAD"
+        request.cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalAndRemoteCacheData
         request.timeoutInterval = 10.0
         
-        var response: NSURLResponse?
+        var response: URLResponse?
         
-        _ = (try? NSURLConnection.sendSynchronousRequest(request, returningResponse: &response)) as NSData?
+        _ = (try? NSURLConnection.sendSynchronousRequest(request as URLRequest, returning: &response)) as Data?
         
-        if let httpResponse = response as? NSHTTPURLResponse {
+        if let httpResponse = response as? HTTPURLResponse {
             if httpResponse.statusCode == 200 {
                 Status = true
             }
@@ -42,34 +42,36 @@ public class IJReachability {
         return Status
     }
     
-    public class func isConnectedToNetworkOfType() -> IJReachabilityType {
+    open class func isConnectedToNetworkOfType() -> IJReachabilityType {
         
         var zeroAddress = sockaddr_in(sin_len: 0, sin_family: 0, sin_port: 0, sin_addr: in_addr(s_addr: 0), sin_zero: (0, 0, 0, 0, 0, 0, 0, 0))
-        zeroAddress.sin_len = UInt8(sizeofValue(zeroAddress))
+        zeroAddress.sin_len = UInt8(MemoryLayout.size(ofValue: zeroAddress))
         zeroAddress.sin_family = sa_family_t(AF_INET)
         
-        guard let defaultRouteReachability = withUnsafePointer(&zeroAddress, {
-            SCNetworkReachabilityCreateWithAddress(nil, UnsafePointer($0))
+        guard let defaultRouteReachability = withUnsafePointer(to: &zeroAddress, {
+            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                SCNetworkReachabilityCreateWithAddress(nil, $0)
+            }
         }) else {
-            return .NotConnected
+            return .notConnected
         }
         
         var flags: SCNetworkReachabilityFlags = []
         if SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) == false {
-            return .NotConnected
+            return .notConnected
         }
         
-        let isReachable = flags.contains(.Reachable)
-        let isWWAN = (flags.intersect(SCNetworkReachabilityFlags.IsWWAN)) != []
+        let isReachable = flags.contains(.reachable)
+        let isWWAN = (flags.intersection(SCNetworkReachabilityFlags.isWWAN)) != []
 
         if(isReachable && isWWAN){
-            return .WWAN
+            return .wwan
         }
         if(isReachable && !isWWAN){
-            return .WiFi
+            return .wiFi
         }
         
-        return .NotConnected
+        return .notConnected
 
     }
     

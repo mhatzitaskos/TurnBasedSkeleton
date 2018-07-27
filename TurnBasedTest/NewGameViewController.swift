@@ -22,7 +22,7 @@ class NewGameViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadTable", name: "kFriendsDataReceived", object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(NewGameViewController.reloadTable), name: NSNotification.Name(rawValue: "kFriendsDataReceived"), object: nil)
     }
 
     override func didReceiveMemoryWarning() {
@@ -30,25 +30,25 @@ class NewGameViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    func reloadTable() {
+    @objc func reloadTable() {
         self.tableView.reloadData()
     }
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return GameCenterSingleton.sharedInstance.friends.count + 1
     }
 
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("NewGameCell", forIndexPath: indexPath)
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "NewGameCell", for: indexPath)
 
         // Configure the cell...
         if indexPath.row == 0 {
@@ -57,7 +57,7 @@ class NewGameViewController: UITableViewController {
                 nameLabel.text = "RANDOM OPPONENT"
             }
             if let imageView = cell.viewWithTag(100) as? UIImageView {
-                imageView.backgroundColor = UIColor.grayColor()
+                imageView.backgroundColor = UIColor.gray
             }
             
         } else {
@@ -76,12 +76,12 @@ class NewGameViewController: UITableViewController {
         return cell
     }
 
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        self.hud = MBProgressHUD.showHUDAddedTo(self.view, animated: true)
+        self.hud = MBProgressHUD.showAdded(to: self.view, animated: true)
         self.hud?.labelText = "INITIALIZING MATCH"
         
-        tableView.deselectRowAtIndexPath(indexPath, animated: false)
+        tableView.deselectRow(at: indexPath, animated: false)
         
         if indexPath.row == 0 {
             
@@ -116,14 +116,14 @@ class NewGameViewController: UITableViewController {
     //This function acts as a dummy function that simulates a turn in the turn based game.
     //In a real game, the turn would first be played by the user, a TurnDataObject would be
     //created with the correct information and then the endTurn function would be called.
-    func playFirstTurn(match: GKTurnBasedMatch) {
+    func playFirstTurn(_ match: GKTurnBasedMatch) {
         let newTurn = TurnDataObject(playerID: GKLocalPlayer.localPlayer().playerID!, word: "Word", substring: "o", substringStart: 1, subStringLength: 1, pointsEarned: 4, turn: 1)
         
         //May pass any message that is necessary for the receiver (ex. playerGroup)
         match.message = ""
         
         GameCenterSingleton.sharedInstance.endTurn(match, newTurn: newTurn) {
-            _ in
+//            _ in
             
             self.hud?.hide(true)
         }

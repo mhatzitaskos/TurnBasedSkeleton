@@ -23,7 +23,7 @@ class GameCell: UITableViewCell {
         // Initialization code
     }
 
-    override func setSelected(selected: Bool, animated: Bool) {
+    override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
@@ -33,35 +33,35 @@ class GameCell: UITableViewCell {
         switch mode! {
             
         case MatchMode.inSearchingModeMatches:
-            acceptPlayButton.hidden = true
-            acceptPlayButton.setTitle("", forState: UIControlState.Normal)
-            declineQuitButton.hidden = false
-            declineQuitButton.setTitle("Quit", forState: UIControlState.Normal)
+            acceptPlayButton.isHidden = true
+            acceptPlayButton.setTitle("", for: UIControlState())
+            declineQuitButton.isHidden = false
+            declineQuitButton.setTitle("Quit", for: UIControlState())
         case MatchMode.inInvitationModeMatches:
-            acceptPlayButton.hidden = false
-            acceptPlayButton.setTitle("Accept", forState: UIControlState.Normal)
-            declineQuitButton.hidden = false
-            declineQuitButton.setTitle("Decline", forState: UIControlState.Normal)
+            acceptPlayButton.isHidden = false
+            acceptPlayButton.setTitle("Accept", for: UIControlState())
+            declineQuitButton.isHidden = false
+            declineQuitButton.setTitle("Decline", for: UIControlState())
         case MatchMode.inWaitingForIntivationReplyModeMatches:
-            acceptPlayButton.hidden = true
-            acceptPlayButton.setTitle("", forState: UIControlState.Normal)
-            declineQuitButton.hidden = false
-            declineQuitButton.setTitle("Quit", forState: UIControlState.Normal)
+            acceptPlayButton.isHidden = true
+            acceptPlayButton.setTitle("", for: UIControlState())
+            declineQuitButton.isHidden = false
+            declineQuitButton.setTitle("Quit", for: UIControlState())
         case MatchMode.localPlayerTurnMatches:
-            acceptPlayButton.hidden = false
-            acceptPlayButton.setTitle("Play", forState: UIControlState.Normal)
-            declineQuitButton.hidden = false
-            declineQuitButton.setTitle("Quit", forState: UIControlState.Normal)
+            acceptPlayButton.isHidden = false
+            acceptPlayButton.setTitle("Play", for: UIControlState())
+            declineQuitButton.isHidden = false
+            declineQuitButton.setTitle("Quit", for: UIControlState())
         case MatchMode.opponentTurnMatches:
-            acceptPlayButton.hidden = true
-            acceptPlayButton.setTitle("", forState: UIControlState.Normal)
-            declineQuitButton.hidden = false
-            declineQuitButton.setTitle("Quit", forState: UIControlState.Normal)
+            acceptPlayButton.isHidden = true
+            acceptPlayButton.setTitle("", for: UIControlState())
+            declineQuitButton.isHidden = false
+            declineQuitButton.setTitle("Quit", for: UIControlState())
         case MatchMode.endedMatches:
-            acceptPlayButton.hidden = true
-            acceptPlayButton.setTitle("", forState: UIControlState.Normal)
-            declineQuitButton.hidden = false
-            declineQuitButton.setTitle("Remove", forState: UIControlState.Normal)
+            acceptPlayButton.isHidden = true
+            acceptPlayButton.setTitle("", for: UIControlState())
+            declineQuitButton.isHidden = false
+            declineQuitButton.setTitle("Remove", for: UIControlState())
         }
         
         if let matchData = match?.matchData {
@@ -77,7 +77,7 @@ class GameCell: UITableViewCell {
         }
     }
     
-    @IBAction func acceptPlayButtonPressed(sender: AnyObject) {
+    @IBAction func acceptPlayButtonPressed(_ sender: AnyObject) {
         print("")
         print("acceptPlayButton Pressed")
         
@@ -94,7 +94,7 @@ class GameCell: UITableViewCell {
         }
     }
     
-    @IBAction func declineQuitButtonPressed(sender: AnyObject) {
+    @IBAction func declineQuitButtonPressed(_ sender: AnyObject) {
         print("")
         print("declineQuitButton Pressed")
         
@@ -111,7 +111,7 @@ class GameCell: UITableViewCell {
             if match?.currentParticipant?.player?.playerID == GKLocalPlayer.localPlayer().playerID {
                 
                 //Local player that has pressed the quit button will lose, independent of score
-                let outcome = GKTurnBasedMatchOutcome.Lost
+                let outcome = GKTurnBasedMatchOutcome.lost
                 
                 GameCenterSingleton.sharedInstance.quitMatch(match, localPlayerOutcome: outcome, completion: {})
             } else {
@@ -123,7 +123,7 @@ class GameCell: UITableViewCell {
     //This function acts as a dummy function that simulates a turn in the turn based game.
     //In a real game, the turn would first be played by the user, a TurnDataObject would be
     //created with the correct information and then the endTurn function would be called.
-    func playTurn(match: GKTurnBasedMatch) {
+    func playTurn(_ match: GKTurnBasedMatch) {
         let newTurn = TurnDataObject(playerID: GKLocalPlayer.localPlayer().playerID!, word: "Word", substring: "o", substringStart: 1, subStringLength: 1, pointsEarned: 4, turn: 1)
         
         GameCenterSingleton.sharedInstance.endTurn(match, newTurn: newTurn) {}
