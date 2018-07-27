@@ -175,9 +175,9 @@ class JSSAlertView: UIViewController {
         
         // position the title
         let titleString = titleLabel.text! as NSString
-        let titleAttr = [NSFontAttributeName:titleLabel.font]
+        let titleAttr = [kCTFontAttributeName:titleLabel.font]
         let titleSize = CGSize(width: contentWidth, height: 90)
-        let titleRect = titleString.boundingRect(with: titleSize, options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: titleAttr, context: nil)
+        let titleRect = titleString.boundingRect(with: titleSize, options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: titleAttr as [NSAttributedStringKey : Any], context: nil)
         yPos += padding
         self.titleLabel.frame = CGRect(x: self.padding, y: yPos, width: self.alertWidth - (self.padding*2), height: ceil(titleRect.size.height))
         yPos += ceil(titleRect.size.height)
@@ -187,10 +187,10 @@ class JSSAlertView: UIViewController {
         if self.textView != nil {
             let textString = textView.text! as NSString
             //let textAttr = [NSFontAttributeName:textView.font]
-            let textAttr = [NSFontAttributeName:textView.font as AnyObject]
+            let textAttr = [kCTFontAttributeName:textView.font as AnyObject]
             let realSize = textView.sizeThatFits(CGSize(width: contentWidth, height: CGFloat.greatestFiniteMagnitude))
             let textSize = CGSize(width: contentWidth, height: CGFloat(fmaxf(Float(90.0), Float(realSize.height))))
-            let textRect = textString.boundingRect(with: textSize, options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: textAttr, context: nil)
+            let textRect = textString.boundingRect(with: textSize, options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: textAttr as [NSAttributedStringKey : Any], context: nil)
             self.textView.frame = CGRect(x: self.padding, y: yPos, width: self.alertWidth - (self.padding*2), height: ceil(textRect.size.height)*2)
             yPos += ceil(textRect.size.height) + padding/2
         }
@@ -375,7 +375,7 @@ class JSSAlertView: UIViewController {
         self.closeAction = action
     }
     
-    func buttonTap() {
+    @objc func buttonTap() {
         closeView(true, source: .close);
     }
     
@@ -383,7 +383,7 @@ class JSSAlertView: UIViewController {
         self.cancelAction = action
     }
 
-    func cancelButtonTap() {
+    @objc func cancelButtonTap() {
         closeView(true, source: .cancel);
     }
     

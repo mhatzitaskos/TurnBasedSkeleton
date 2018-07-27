@@ -68,7 +68,7 @@ open class MatchDataEncoding {
                     print("Match Turn: \(turn.playerID), \(turn.word), \(turn.substring), \(turn.substringStart), \(turn.subStringLength), \(turn.pointsEarned), \(turn.turn)")
                 }
                 
-                return (initiator!, turnsData, currentRound!, score1!, score2!, playerGroup!, lastTurnTime!, readChatMessages1!, readChatMessages2!)
+                return (initiator, turnsData, currentRound!, score1!, score2!, playerGroup!, lastTurnTime, readChatMessages1!, readChatMessages2!)
                 
             } else {
                 

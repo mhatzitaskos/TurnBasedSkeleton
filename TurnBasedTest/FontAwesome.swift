@@ -42,7 +42,7 @@ private class FontLoader {
         let font = CGFont(provider!)
 
         var error: Unmanaged<CFError>?
-        if !CTFontManagerRegisterGraphicsFont(font, &error) {
+        if !CTFontManagerRegisterGraphicsFont(font!, &error) {
             let errorDescription: CFString = CFErrorCopyDescription(error!.takeUnretainedValue())
             let nsError = error!.takeUnretainedValue() as AnyObject as! NSError
             NSException(name: NSExceptionName.internalInconsistencyException, reason: errorDescription as String, userInfo: [NSUnderlyingErrorKey: nsError]).raise()
@@ -83,7 +83,14 @@ public extension UIImage {
         let paragraph = NSMutableParagraphStyle()
         paragraph.lineBreakMode = NSLineBreakMode.byWordWrapping
         paragraph.alignment = .center
-        let attributedString = NSAttributedString(string: String.fontAwesomeIconWithName(name) as String, attributes: [NSFontAttributeName: UIFont.fontAwesomeOfSize(max(size.width, size.height)), NSForegroundColorAttributeName: textColor, NSParagraphStyleAttributeName:paragraph])
+        
+        let attributes = [NSAttributedStringKey.foregroundColor: textColor,
+                          NSAttributedStringKey.paragraphStyle:paragraph,
+                          NSAttributedStringKey.font:UIFont.fontAwesomeOfSize(max(size.width, size.height)) as Any
+            ] as [NSAttributedStringKey : Any]
+        
+        let attributedString = NSAttributedString(string: String.fontAwesomeIconWithName(name) as String,
+                                                  attributes: attributes)
         let size = attributedString.sizeWithMaxWidth(size.width)
         UIGraphicsBeginImageContextWithOptions(size, false , 0.0)
         attributedString.draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))

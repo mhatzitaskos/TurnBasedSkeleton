@@ -21,7 +21,7 @@ class ListOfGamesViewController: UITableViewController {
 
         refreshTable.addTarget(self, action: #selector(ListOfGamesViewController.reloadMatches), for: UIControlEvents.valueChanged)
         refreshTable.tintColor = UIColor.gray
-        refreshTable.attributedTitle = NSAttributedString(string: "LOADING", attributes: [NSForegroundColorAttributeName : UIColor.gray])
+        refreshTable.attributedTitle = NSAttributedString(string: "LOADING", attributes: [kCTForegroundColorAttributeName as NSAttributedStringKey : UIColor.gray])
         refreshTable.backgroundColor = UIColor.clear
         tableView.addSubview(refreshTable)
     }
@@ -31,7 +31,7 @@ class ListOfGamesViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    func reloadMatches() {
+    @objc func reloadMatches() {
                 
         GameCenterSingleton.sharedInstance.reloadMatches({
             (matches: [String:[GKTurnBasedMatch]]?) in
@@ -53,7 +53,7 @@ class ListOfGamesViewController: UITableViewController {
         })
     }
     
-    func reloadTable() {
+    @objc func reloadTable() {
         print("")
         print("Reloading list of games table")
         

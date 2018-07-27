@@ -30,7 +30,7 @@ class NewGameViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    func reloadTable() {
+    @objc func reloadTable() {
         self.tableView.reloadData()
     }
 
@@ -123,7 +123,7 @@ class NewGameViewController: UITableViewController {
         match.message = ""
         
         GameCenterSingleton.sharedInstance.endTurn(match, newTurn: newTurn) {
-            _ in
+//            _ in
             
             self.hud?.hide(true)
         }

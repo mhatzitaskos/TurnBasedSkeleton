@@ -48,11 +48,11 @@ class ProfilePhoto {
         
         if let p = player {
             
-            let size = smallSize ? GKPhotoSizeSmall : GKPhotoSizeNormal
+            let size = smallSize ? GKPhotoSize.small : GKPhotoSize.normal
             var photoAlreadyLoaded = false
             var profilePhoto: UIImage!
             
-            if size == GKPhotoSizeNormal {
+            if size == GKPhotoSize.normal {
                 
                 if let photo = singleton.normalProfilePhotosDictionary[p.playerID!] {
                     photoAlreadyLoaded = true
@@ -110,7 +110,7 @@ class ProfilePhoto {
                         
                         if let playerID = p.playerID {
                             
-                            if size == GKPhotoSizeNormal {
+                            if size == GKPhotoSize.normal {
                                 
                                 profilePhoto = iconView.pb_takeSnapshot()
                                 singleton.normalProfilePhotosDictionary[playerID] = profilePhoto
@@ -134,7 +134,7 @@ class ProfilePhoto {
                         
                         if let playerID = p.playerID {
                             
-                            if size == GKPhotoSizeNormal {
+                            if size == GKPhotoSize.normal {
                                 
                                 singleton.normalProfilePhotosDictionary[playerID] = profilePhoto
                                 
